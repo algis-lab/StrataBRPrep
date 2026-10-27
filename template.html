@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Strata Board Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect y='2' width='32' height='8' fill='%235FA83A'/%3E%3Crect y='12' width='24' height='8' fill='%238A3E9C'/%3E%3Crect y='22' width='30' height='8' fill='%232E9FB8'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#E6E9E2; --surface:#F5F6F1; --sunk:#DCE0D8; --ink:#1D2A31; --muted:#56666C; --line:#C3C9C0;
+  --d1:#2B93AB; --d2:#86409A; --d3:#4F9A2E;
+  --ok:#2A7A47; --ok-bg:#DCEEDF; --bad:#BD3B26; --bad-bg:#F6DED8; --warn:#9A6A00; --warn-bg:#F5EBCC;
+  --focus:#2B93AB;
+  --sans:"Archivo",system-ui,sans-serif; --serif:"Spectral",Georgia,serif;
+  --r-sm:4px; --r-md:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141D21; --surface:#1C272C; --sunk:#111A1E; --ink:#E3E8E2; --muted:#93A3A6; --line:#2E3D43;
+    --d1:#4DB6CF; --d2:#B57AC6; --d3:#7CC25A;
+    --ok:#6CC88A; --ok-bg:#183326; --bad:#F0806B; --bad-bg:#3A1F1A; --warn:#E3B44B; --warn-bg:#352C14; --focus:#4DB6CF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141D21; --surface:#1C272C; --sunk:#111A1E; --ink:#E3E8E2; --muted:#93A3A6; --line:#2E3D43;
+  --d1:#4DB6CF; --d2:#B57AC6; --d3:#7CC25A;
+  --ok:#6CC88A; --ok-bg:#183326; --bad:#F0806B; --bad-bg:#3A1F1A; --warn:#E3B44B; --warn-bg:#352C14; --focus:#4DB6CF;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans);font-variation-settings:"wdth" 100}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;font-weight:700;font-variation-settings:"wdth" 115;letter-spacing:-.01em;line-height:1.15}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+@media (max-width:600px){.wrap{padding:0 16px}}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:9px 14px;font-weight:600;min-height:42px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{opacity:.9}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--sunk)}
+.btn.small{min-height:34px;padding:5px 10px;font-size:.9rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+kbd{font:600 .72rem/1 var(--sans);border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:3px 5px;color:var(--muted);background:var(--bg)}
+
+/* ===== lock ===== */
+#lock{min-height:100vh;display:grid;place-items:center;padding:24px}
+.lockbox{width:min(400px,100%)}
+.lock-strata{display:flex;flex-direction:column;gap:3px;margin-bottom:28px}
+.lock-strata span{height:12px;border-radius:2px;transform-origin:left}
+.lock-strata span:nth-child(1){background:var(--d3);width:88%}
+.lock-strata span:nth-child(2){background:var(--d2);width:64%}
+.lock-strata span:nth-child(3){background:var(--d1);width:100%}
+@media (prefers-reduced-motion:no-preference){
+  .lock-strata span{animation:deposit .7s cubic-bezier(.2,.8,.2,1) both}
+  .lock-strata span:nth-child(3){animation-delay:.05s}.lock-strata span:nth-child(2){animation-delay:.2s}.lock-strata span:nth-child(1){animation-delay:.35s}
+}
+@keyframes deposit{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.lockbox h1{font-size:2.6rem;font-variation-settings:"wdth" 125;font-weight:800}
+.lockbox p{margin:6px 0 24px;color:var(--muted)}
+.pin{display:flex;gap:10px}
+.pin input{flex:1;min-width:0;text-align:center;font:700 2rem/1 var(--sans);letter-spacing:.5em;padding:12px 0 12px .5em;border:2px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.pin input:focus{border-color:var(--ink);outline:none}
+.lock-row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px}
+.lock-msg{min-height:1.5em;margin-top:12px;color:var(--bad);font-weight:500}
+.lock-msg.busy{color:var(--muted)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+label.check{display:inline-flex;gap:8px;align-items:center;cursor:pointer;color:var(--muted)}
+label.check input{width:18px;height:18px;accent-color:var(--ink)}
+
+/* ===== top bar ===== */
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-variation-settings:"wdth" 125;font-size:1.25rem;background:none;border:0;padding:0}
+.brand i{display:flex;flex-direction:column;gap:2px;width:20px}
+.brand i b{height:4px;border-radius:1px}
+.brand i b:nth-child(1){background:var(--d3);width:80%}.brand i b:nth-child(2){background:var(--d2);width:60%}.brand i b:nth-child(3){background:var(--d1)}
+.top .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.88rem;font-weight:600;padding:5px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line);white-space:nowrap}
+.chip .gem{width:10px;height:10px;transform:rotate(45deg);border-radius:2px}
+@media (max-width:640px){.top .hide-sm{display:none}}
+
+/* ===== dashboard ===== */
+.dash{display:grid;grid-template-columns:minmax(300px,410px) 1fr;gap:28px;padding:28px 0 64px;align-items:start}
+.dash-side{grid-row:span 3}
+@media (max-width:900px){.dash{grid-template-columns:1fr}.dash-side{grid-row:auto;order:3}.insights{order:4}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px}
+.panel h2{font-size:1.15rem}
+.panel .sub{color:var(--muted);font-size:.92rem;margin:4px 0 0}
+
+/* strat column — the signature */
+.column-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:14px}
+.column-head h2{font-size:1.15rem}
+.strat{display:flex;flex-direction:column}
+.bed{display:grid;grid-template-columns:45% 55%;align-items:stretch;background:none;border:0;padding:0;text-align:left;width:100%;border-top:1px solid color-mix(in srgb,var(--ink) 30%,transparent)}
+.bed:hover .rock{filter:brightness(1.08)}
+.bed:hover .bed-label b{text-decoration:underline}
+.rock-cell{display:block;position:relative;border-right:2px solid var(--ink);border-left:2px solid var(--ink)}
+.rock{display:block;height:100%;background-color:var(--c);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.rock.p1{background-image:radial-gradient(color-mix(in srgb,var(--ink) 45%,transparent) 1px,transparent 1.4px);background-size:7px 7px}
+.rock.p2{background-image:repeating-linear-gradient(60deg,transparent 0 6px,color-mix(in srgb,var(--ink) 30%,transparent) 6px 7px),repeating-linear-gradient(-60deg,transparent 0 6px,color-mix(in srgb,var(--ink) 30%,transparent) 6px 7px)}
+.rock.p3{background-image:linear-gradient(color-mix(in srgb,var(--ink) 35%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--ink) 35%,transparent) 1px,transparent 1px);background-size:16px 8px}
+.rock.empty{background-color:transparent}
+.bed-label{padding:2px 0 2px 10px;font-size:.82rem;line-height:1.2;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.bed-label b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bed-label span{color:var(--muted);font-variant-numeric:tabular-nums}
+.unconf{display:grid;grid-template-columns:45% 55%;align-items:center;min-height:30px;padding:4px 0}
+.unconf svg{width:100%;height:14px;display:block}
+.unconf .day-name{padding-left:10px;font-weight:700;font-size:.8rem;line-height:1.2;color:var(--muted)}
+.strat-base{height:2px;background:var(--ink);width:45%}
+.legend{margin-top:14px;font-size:.84rem;color:var(--muted);line-height:1.45}
+
+/* projection */
+.proj{display:grid;grid-template-columns:auto 1fr;gap:20px 28px;align-items:center}
+@media (max-width:560px){.proj{grid-template-columns:1fr}}
+.gwa{font-size:4.2rem;font-weight:800;font-variation-settings:"wdth" 70;line-height:.9;letter-spacing:-.02em}
+.gwa small{font-size:1.4rem;font-weight:600}
+.verdict{display:inline-block;margin-top:8px;font-weight:700;font-size:.9rem;padding:3px 8px;border-radius:var(--r-sm)}
+.verdict.pass{background:var(--ok-bg);color:var(--ok)}
+.verdict.fail{background:var(--bad-bg);color:var(--bad)}
+.verdict.low{background:var(--warn-bg);color:var(--warn)}
+.daybars{display:flex;flex-direction:column;gap:12px}
+.daybar .row{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:4px}
+.daybar .row b{font-weight:600}
+.track{position:relative;height:12px;background:var(--sunk);border-radius:2px}
+.track .fill{position:absolute;inset:0 auto 0 0;border-radius:2px}
+.track .mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.track .mark.m50{opacity:.4}
+
+/* start + modes */
+.start{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.start h2{font-size:1.5rem}
+.goal{display:flex;align-items:center;gap:14px}
+.ring{--p:0;width:58px;height:58px;border-radius:50%;background:conic-gradient(var(--ink) calc(var(--p)*1%),var(--sunk) 0);display:grid;place-items:center;flex:none}
+.ring::after{content:attr(data-v);width:44px;height:44px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:18px}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
+.mode:hover{border-color:var(--ink)}
+.mode b{font-size:1.02rem;font-variation-settings:"wdth" 110}
+.mode span{color:var(--muted);font-size:.88rem;line-height:1.4}
+.mode em{font-style:normal;font-weight:700;font-size:.8rem;margin-top:auto;padding-top:4px}
+
+.insights{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.stat-big{font-size:2rem;font-weight:800;font-variation-settings:"wdth" 75;line-height:1}
+.calib{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.calib .row{display:grid;grid-template-columns:62px 1fr 44px;gap:10px;align-items:center;font-size:.88rem}
+.focus-list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.focus-list button{width:100%;display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 12px;text-align:left}
+.focus-list button:hover{border-color:var(--ink)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
+.heat i{width:11px;height:11px;border-radius:2px;background:var(--sunk)}
+.heat i[data-l="1"]{background:color-mix(in srgb,var(--d3) 35%,var(--sunk))}
+.heat i[data-l="2"]{background:color-mix(in srgb,var(--d3) 60%,var(--sunk))}
+.heat i[data-l="3"]{background:color-mix(in srgb,var(--d3) 85%,var(--sunk))}
+.heat i[data-l="4"]{background:var(--d3)}
+.heat i.future{visibility:hidden}
+.mohs{display:flex;gap:3px;margin-top:12px}
+.mohs i{flex:1;height:22px;border-radius:2px;background:var(--sunk);display:grid;place-items:center;font:700 .7rem/1 var(--sans);font-style:normal;color:var(--muted)}
+.mohs i.on{background:var(--ink);color:var(--bg)}
+.sessions{list-style:none;margin:10px 0 0;padding:0;font-size:.9rem}
+.sessions li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.empty-note{color:var(--muted);font-size:.92rem;margin:10px 0 0}
+
+/* ===== setup screens ===== */
+.page{padding:28px 0 64px;max-width:760px}
+.page h1{font-size:2rem;font-variation-settings:"wdth" 120}
+.page .lead{color:var(--muted);margin:6px 0 24px;max-width:60ch}
+.field{margin-bottom:22px}
+.field > .lbl{font-weight:700;margin-bottom:8px;display:block}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 14px;font-weight:600;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.subj-group{margin-top:10px}
+.subj-group h3{font-size:.95rem;display:flex;align-items:center;gap:8px;margin:14px 0 6px}
+.subj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:4px 16px}
+.subj-grid label{display:flex;gap:8px;align-items:center;font-size:.92rem;padding:3px 0;cursor:pointer}
+.subj-grid label input{accent-color:var(--ink);width:16px;height:16px;flex:none}
+.subj-grid label span.n{color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums}
+select,input[type=number],input[type=date],input[type=search]{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:9px 10px;min-height:42px}
+.row-fields{display:flex;flex-wrap:wrap;gap:14px}
+.row-fields > div{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.92rem}
+.match{position:sticky;bottom:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:14px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+
+/* ===== quiz ===== */
+.qwrap{max-width:780px;margin:0 auto;padding:18px 20px 80px}
+@media (max-width:600px){.qwrap{padding:12px 16px 80px}}
+.qbar{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.qbar .title{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer{font-weight:700;font-variant-numeric:tabular-nums;font-size:1.05rem}
+.timer.low{color:var(--bad)}
+.prog{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;margin-bottom:18px}
+.prog span{display:block;height:100%;background:var(--ink);transition:width .3s}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:24px}
+@media (max-width:600px){.qcard{padding:18px}}
+.qmeta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:.85rem;color:var(--muted);margin-bottom:14px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--ink)}
+.tag::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--c)}
+.basis{border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+.basis.A{border-color:var(--ink);color:var(--ink);font-weight:600}
+.qtext{font:500 1.32rem/1.45 var(--serif);margin:0 0 20px;letter-spacing:0}
+@media (max-width:600px){.qtext{font-size:1.15rem}}
+.choices{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.choice{width:100%;display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:var(--r-md);padding:12px 14px;font:400 1.05rem/1.4 var(--serif)}
+.choice kbd{margin-top:2px;flex:none}
+.choice:hover:not(:disabled){border-color:var(--ink)}
+.choice.sel{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.choice.right{border-color:var(--ok);background:var(--ok-bg)}
+.choice.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.choice:disabled{cursor:default}
+.choice.dim{opacity:.6}
+.conf{margin-top:16px;padding:14px;border-radius:var(--r-md);background:var(--sunk)}
+.conf p{margin:0 0 10px;font-weight:600}
+.conf .btns{display:flex;flex-wrap:wrap;gap:8px}
+.verdict-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:18px;font-weight:700;font-size:1.05rem}
+.verdict-line.ok{color:var(--ok)}.verdict-line.bad{color:var(--bad)}
+.explain{margin-top:10px;font:400 1.02rem/1.6 var(--serif);max-width:68ch}
+.note{margin-top:12px;font-size:.9rem;padding:10px 12px;border-radius:var(--r-sm);background:var(--sunk)}
+.note.verify{background:var(--warn-bg);color:var(--warn)}
+.qfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+.flag[aria-pressed="true"]{color:var(--warn);border-color:var(--warn)}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px;margin-top:22px}
+.palette button{height:34px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);font-size:.8rem;font-weight:600;font-variant-numeric:tabular-nums}
+.palette button.done{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.palette button.cur{outline:2px solid var(--focus);outline-offset:1px}
+.palette button.fl{box-shadow:inset 0 -4px 0 var(--warn)}
+.hint{font-size:.82rem;color:var(--muted);margin-top:14px}
+@media (hover:none){.hint{display:none}}
+
+/* sprint */
+.seismo{width:100%;height:90px;display:block;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:14px}
+.quake{animation:quake .4s}
+@keyframes quake{20%{transform:translate(-6px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,1px)}80%{transform:translate(2px,-1px)}}
+@media (prefers-reduced-motion:reduce){.quake{animation:none}}
+.sprint-score{display:flex;gap:18px;align-items:baseline}
+.sprint-score b{font-size:1.6rem;font-variation-settings:"wdth" 75}
+
+/* results */
+.res-head{display:flex;flex-wrap:wrap;gap:24px 40px;align-items:flex-end;margin:10px 0 24px}
+.res-big{font-size:5rem;font-weight:800;font-variation-settings:"wdth" 65;line-height:.85}
+.res-big small{font-size:1.6rem}
+.res-stats{display:flex;gap:28px;flex-wrap:wrap}
+.res-stats div{display:flex;flex-direction:column}
+.res-stats b{font-size:1.4rem;font-variation-settings:"wdth" 80}
+.res-stats span{color:var(--muted);font-size:.88rem}
+table.breakdown{width:100%;border-collapse:collapse;font-size:.92rem}
+table.breakdown th,table.breakdown td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.breakdown th{color:var(--muted);font-weight:600}
+table.breakdown td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.minibar{height:8px;background:var(--sunk);border-radius:2px;min-width:60px}
+.minibar span{display:block;height:100%;border-radius:2px}
+details.item{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);margin-bottom:8px}
+details.item summary{padding:12px 14px;cursor:pointer;font:500 1rem/1.45 var(--serif);list-style:none;display:flex;gap:10px}
+details.item summary::-webkit-details-marker{display:none}
+details.item summary .st{flex:none;margin-top:6px}
+details.item .body{padding:0 14px 14px 34px}
+details.item .body ul{margin:0 0 8px;padding-left:18px;font-family:var(--serif)}
+details.item .body li.ans{color:var(--ok);font-weight:600}
+details.item .body li.pick{color:var(--bad);text-decoration:line-through}
+.section-title{font-size:1.2rem;margin:30px 0 12px}
+
+/* browse */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.toolbar input[type=search]{flex:1 1 240px}
+.count{color:var(--muted);font-size:.9rem;margin-bottom:10px}
+
+/* dialog */
+dialog{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);color:var(--ink);padding:24px;width:min(520px,calc(100% - 32px))}
+dialog::backdrop{background:rgba(10,16,20,.45)}
+dialog h2{font-size:1.3rem;margin-bottom:16px}
+.set-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-top:1px solid var(--line)}
+.set-row div span{display:block;color:var(--muted);font-size:.86rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:var(--r-sm);font-weight:600;z-index:20}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="lock">
+  <form class="lockbox" id="lockForm" autocomplete="off">
+    <div class="lock-strata" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h1>Strata</h1>
+    <p>Board review for the Philippine Geologist Licensure Exam. Enter the access PIN to open the question bank.</p>
+    <div class="pin">
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="12" aria-label="Access PIN" autofocus>
+      <button class="btn primary" type="submit">Unlock</button>
+    </div>
+    <div class="lock-row">
+      <label class="check"><input type="checkbox" id="remember"> Remember this device</label>
+    </div>
+    <div class="lock-msg" id="lockMsg" role="status" aria-live="polite"></div>
+  </form>
+</div>
+<div id="app" hidden></div>
+<dialog id="settings"></dialog>
+
+<script>
+"use strict";
+const VAULT = /*__VAULT__*/null;
+const KEY_P = "strata.progress.v1", KEY_PIN = "strata.pin";
+
+/* ---------- storage helpers ---------- */
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct = x => Math.round(x * 100);
+const now = () => Date.now();
+const DAY = 864e5;
+const dayKey = (t=now()) => { const d = new Date(t); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const fmtTime = s => { s = Math.max(0, Math.round(s)); const h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60; return (h? h+":"+String(m).padStart(2,"0") : m) + ":" + String(x).padStart(2,"0"); };
+
+/* ---------- unlock ---------- */
+async function decryptVault(pin){
+  const b = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b(VAULT.salt), iterations:VAULT.it, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b(VAULT.iv)}, key, b(VAULT.ct));
+  const stream = new Blob([pt]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return JSON.parse(await new Response(stream).text());
+}
+async function tryUnlock(pin, silent){
+  const msg = $("#lockMsg");
+  if(!window.crypto || !crypto.subtle){ msg.textContent = "This page needs HTTPS (GitHub Pages provides it) to unlock."; return; }
+  msg.className = "lock-msg busy"; msg.textContent = "Unlocking the question bank…";
+  try{
+    const data = await decryptVault(pin);
+    if($("#remember").checked) LS.set(KEY_PIN, pin);
+    start(data);
+  }catch(e){
+    if(silent){ LS.del(KEY_PIN); msg.textContent = ""; return; }
+    msg.className = "lock-msg"; msg.textContent = "That PIN didn't unlock the bank. Check it and try again.";
+    const f = $("#lockForm"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
+    $("#pinInput").select();
+  }
+}
+$("#lockForm").addEventListener("submit", e => { e.preventDefault(); const v = $("#pinInput").value.trim(); if(v) tryUnlock(v); });
+function lockApp(){ LS.del(KEY_PIN); location.reload(); }
+
+/* ---------- data model ---------- */
+const DAYS = {1:"General Geology", 2:"Petrology & Mineralogy", 3:"Applied Geology"};
+const BASIS = {A:"2019 board paper", R:"Examinee recall", T:"Trend topic"};
+const MOHS = [["Talc",0],["Gypsum",20],["Calcite",60],["Fluorite",120],["Apatite",200],["Orthoclase",320],["Quartz",460],["Topaz",620],["Corundum",820],["Diamond",1000]];
+const INTERVALS = [10*60e3, 1*DAY, 3*DAY, 7*DAY, 16*DAY, 35*DAY];   // Leitner box review gaps
+const STABILITY = [0.3, 2, 5, 12, 30, 70];                          // days, for the forgetting curve
+const CONF = {1:"Sure", 2:"Unsure", 3:"Guess"};
+const MODE_NAMES = {smart:"Smart review", drill:"Subject drill", mock:"Mock board exam", sprint:"Seismic sprint", retry:"Missed items"};
+let Q = [], QI = {}, SUBJ = [], P, S = null;
+
+function defaultProgress(){
+  return {v:1, items:{}, flags:{}, log:[], days:{}, sessions:[], sprintBest:0,
+    settings:{askConf:true, goal:30, examDate:"", theme:"auto", smartSize:20, mockItems:100, mockMin:120}};
+}
+function save(){
+  if(P.log.length > 8000) P.log = P.log.slice(-8000);
+  if(P.sessions.length > 200) P.sessions = P.sessions.slice(-200);
+  if(!LS.set(KEY_P, P)) toast("Progress couldn't be saved in this browser. Export it from Settings to keep it.");
+}
+function start(data){
+  Q = data.sort((a,b) => a.id - b.id);
+  Q.forEach(q => QI[q.id] = q);
+  const seen = {};
+  Q.forEach(q => { if(!seen[q.s]){ seen[q.s] = {name:q.s, day:q.d, ids:[]}; SUBJ.push(seen[q.s]); } seen[q.s].ids.push(q.id); });
+  P = Object.assign(defaultProgress(), LS.get(KEY_P, {}));
+  P.settings = Object.assign(defaultProgress().settings, P.settings || {});
+  applyTheme();
+  $("#lock").hidden = true; $("#app").hidden = false;
+  home();
+}
+function applyTheme(){ const t = P.settings.theme; if(t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
+
+/* ---------- scoring engine ---------- */
+const it = id => P.items[id];
+function record(id, ok, conf, ms, mode){
+  const t = now();
+  let r = P.items[id];
+  if(!r){ r = P.items[id] = {n:0, c:0, box:0, due:0, last:0, first:ok?1:0}; }
+  r.n++; if(ok) r.c++;
+  r.last = t; r.lr = ok ? 1 : 0; r.conf = conf || 0;
+  if(ok){
+    if(conf === 3) r.box = Math.max(r.box, 1);          // a lucky guess doesn't earn promotion
+    else r.box = Math.min(5, r.box + 1);
+    if(r.blind && conf === 1) delete r.blind;
+  }else{
+    if(conf === 1) r.blind = 1;                          // confidently wrong = blind spot
+    r.box = 0;
+  }
+  r.due = t + INTERVALS[r.box];
+  P.log.push([t, id, ok?1:0, conf||0, Math.round(ms||0), mode]);
+  const k = dayKey(t); P.days[k] = (P.days[k] || 0) + 1;
+}
+function itemMastery(id){ const r = it(id); return r ? r.box / 5 : 0; }
+function recallP(id, prior){
+  const r = it(id);
+  if(!r) return prior;
+  const dt = (now() - r.last) / DAY;
+  const ret = Math.exp(-dt / STABILITY[r.box]);
+  return r.box === 0 ? 0.25 + 0.75 * 0.3 * ret + 0.75*0.1 : 0.25 + 0.75 * ret;
+}
+function subjectStats(sub){
+  let m = 0, seen = 0, firstN = 0, firstOk = 0, mastered = 0, due = 0;
+  const t = now();
+  for(const id of sub.ids){
+    const r = it(id);
+    if(r){ seen++; m += r.box/5; firstN++; firstOk += r.first; if(r.box >= 3) mastered++; if(r.due <= t) due++; }
+  }
+  const prior = (firstOk + 2*0.45) / (firstN + 2);
+  let p = 0; for(const id of sub.ids) p += recallP(id, prior);
+  return {mastery: m / sub.ids.length, coverage: seen / sub.ids.length, seen, mastered, due, proj: p / sub.ids.length, n: sub.ids.length};
+}
+function projection(){
+  const days = {1:{p:0,n:0},2:{p:0,n:0},3:{p:0,n:0}};
+  const per = {};
+  for(const s of SUBJ){ const st = subjectStats(s); per[s.name] = st; days[s.day].p += st.proj * st.n; days[s.day].n += st.n; }
+  const dr = [1,2,3].map(d => days[d].p / days[d].n);
+  const gwa = (dr[0] + dr[1] + dr[2]) / 3;
+  const seen = Object.keys(P.items).length;
+  return {dr, gwa, per, coverage: seen / Q.length, seen};
+}
+function rank(){
+  let mastered = 0; for(const k in P.items) if(P.items[k].box >= 3) mastered++;
+  let i = 0; while(i+1 < MOHS.length && mastered >= MOHS[i+1][1]) i++;
+  return {i, name:MOHS[i][0], hardness:i+1, mastered, next: MOHS[i+1] || null};
+}
+function streak(){
+  let s = 0, t = now();
+  if((P.days[dayKey(t)] || 0) < 10) t -= DAY;
+  while((P.days[dayKey(t)] || 0) >= 10){ s++; t -= DAY; }
+  return s;
+}
+function calibration(){
+  const b = {1:[0,0],2:[0,0],3:[0,0]};
+  for(const e of P.log.slice(-1500)) if(e[3]) { b[e[3]][0] += e[2]; b[e[3]][1]++; }
+  let blind = 0; for(const k in P.items) if(P.items[k].blind) blind++;
+  return {b, blind};
+}
+function pace(){
+  const xs = P.log.filter(e => e[5] !== "sprint" && e[4] > 0 && e[4] < 600000).slice(-300);
+  if(!xs.length) return null;
+  return xs.reduce((a,e) => a + e[4], 0) / xs.length / 1000;
+}
+function dueIds(){ const t = now(); return Object.keys(P.items).filter(k => P.items[k].due <= t).map(Number); }
+function missedIds(){ return Object.keys(P.items).filter(k => P.items[k].lr === 0).map(Number); }
+
+/* ---------- queues ---------- */
+function smartQueue(size){
+  const t = now();
+  const due = Object.keys(P.items).map(Number).filter(id => P.items[id].due <= t)
+    .sort((a,b) => (P.items[b].blind||0) - (P.items[a].blind||0) || P.items[a].due - P.items[b].due);
+  const nDue = Math.min(due.length, Math.ceil(size * 0.6));
+  const picked = new Set(due.slice(0, nDue));
+  // fill with new items, weighted toward weak, heavy subjects
+  const pools = SUBJ.map(s => { const st = subjectStats(s); return {ids: shuffle(s.ids.filter(id => !P.items[id])), w: (1 - st.mastery + 0.08) * Math.sqrt(s.ids.length)}; }).filter(p => p.ids.length);
+  while(picked.size < size && pools.some(p => p.ids.length)){
+    const live = pools.filter(p => p.ids.length); const tot = live.reduce((a,p) => a + p.w, 0);
+    let x = Math.random() * tot, chosen = live[0];
+    for(const p of live){ x -= p.w; if(x <= 0){ chosen = p; break; } }
+    picked.add(chosen.ids.pop());
+  }
+  // still short (everything seen): take the least-mastered, soonest-due items
+  if(picked.size < size){
+    const rest = Q.map(q => q.id).filter(id => !picked.has(id)).sort((a,b) => (P.items[a].box - P.items[b].box) || (P.items[a].due - P.items[b].due));
+    for(const id of rest){ if(picked.size >= size) break; picked.add(id); }
+  }
+  return shuffle([...picked]);
+}
+function mockQueue(day, n){
+  const subs = SUBJ.filter(s => day === 0 || s.day === day);
+  const ids = [];
+  const days = day === 0 ? [1,2,3] : [day];
+  for(const d of days){
+    const ds = subs.filter(s => s.day === d); const tot = ds.reduce((a,s) => a + s.ids.length, 0);
+    let want = ds.map(s => ({s, k: Math.floor(n * s.ids.length / tot), frac: (n * s.ids.length / tot) % 1}));
+    let left = n - want.reduce((a,w) => a + w.k, 0);
+    want.sort((a,b) => b.frac - a.frac).forEach(w => { if(left > 0){ w.k++; left--; } });
+    const part = []; want.forEach(w => part.push(...shuffle(w.s.ids).slice(0, w.k)));
+    ids.push(...shuffle(part));
+  }
+  return ids;
+}
+
+/* ---------- session ---------- */
+const PIN_LAST = /^(all|none|neither|both) of (these|the above|them)\.?$/i;
+function choiceOrder(q){
+  const o = shuffle([0,1,2,3]);
+  const tail = o.filter(i => PIN_LAST.test(q.c[i])), head = o.filter(i => !PIN_LAST.test(q.c[i]));
+  return head.concat(tail);
+}
+function startSession(mode, ids, opts={}){
+  if(!ids.length){ toast("No items match that selection."); return; }
+  S = {mode, ids, i:0, ans:{}, order:{}, flags:{}, t0:now(), qt:now(), limit:opts.limit||0, title: opts.title || MODE_NAMES[mode], day:opts.day, meta:opts};
+  ids.forEach(id => S.order[id] = choiceOrder(QI[id]));
+  if(mode === "sprint"){ S.score = 0; S.wrong = 0; S.penalty = 0; S.trace = []; }
+  clearInterval(window._tick);
+  if(S.limit) window._tick = setInterval(tick, 250);
+  renderQuiz();
+}
+function remaining(){ return S.limit - (now() - S.t0)/1000 - (S.penalty||0); }
+function tick(){
+  if(!S) return clearInterval(window._tick);
+  const r = remaining(); const el = $("#timer");
+  if(el){ el.textContent = fmtTime(r); el.classList.toggle("low", r < (S.mode === "sprint" ? 15 : 300)); }
+  if(r <= 0){ clearInterval(window._tick); if(S.mode === "sprint") finishSprint(); else finishMock(true); }
+}
+
+/* ---------- views ---------- */
+const app = $("#app");
+function topbar(){
+  const rk = rank(), st = streak();
+  let exam = "";
+  if(P.settings.examDate){ const d = Math.ceil((new Date(P.settings.examDate+"T00:00:00") - new Date(dayKey()+"T00:00:00")) / DAY); if(d >= 0) exam = `<span class="chip hide-sm num" title="Days until your exam">${d === 0 ? "Exam day" : d + (d===1?" day":" days") + " to exam"}</span>`; }
+  return `<header class="top"><div class="wrap">
+    <button class="brand" data-act="home" aria-label="Strata dashboard"><i aria-hidden="true"><b></b><b></b><b></b></i>Strata</button>
+    <span class="spacer"></span>${exam}
+    <span class="chip num" title="Days in a row with 10 or more answers">${st} day streak</span>
+    <span class="chip hide-sm" title="Rank by mastered items (Mohs scale)"><span class="gem" style="background:var(--d${(rk.i%3)+1})"></span>${rk.name}</span>
+    <button class="btn ghost small" data-act="settings">Settings</button>
+  </div></header>`;
+}
+function home(){
+  S = null; clearInterval(window._tick);
+  const pr = projection(), rk = rank(), cal = calibration(), pc = pace();
+  const today = P.days[dayKey()] || 0, goal = P.settings.goal;
+  const due = dueIds().length, missed = missedIds().length;
+  const lowData = pr.seen < 60;
+  const pass = pr.gwa >= .70 && pr.dr.every(x => x >= .50);
+  const verdict = lowData ? `<span class="verdict low">Answer ${60 - pr.seen} more items for a reliable projection</span>`
+    : pass ? `<span class="verdict pass">On track to pass</span>` : `<span class="verdict fail">Below the passing line</span>`;
+
+  // stratigraphic column, youngest (Day 3) on top
+  let col = "";
+  for(const d of [3,2,1]){
+    col += `<div class="unconf" aria-hidden="true"><svg viewBox="0 0 100 14" preserveAspectRatio="none"><path d="M0 7 Q 6 1 12 7 T 24 7 T 36 7 T 48 7 T 60 7 T 72 7 T 84 7 T 96 7 T 108 7" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg><span class="day-name">Day ${d}, ${DAYS[d]}</span></div>`;
+    const subs = SUBJ.filter(s => s.day === d).slice().reverse();
+    for(const s of subs){
+      const st = pr.per[s.name]; const h = Math.round(20 + s.ids.length * 0.3);
+      const w = st.seen ? 22 + 78 * st.mastery : 0;
+      col += `<button class="bed" style="height:${h}px" data-act="drillSubject" data-s="${esc(s.name)}" aria-label="${esc(s.name)}: ${pct(st.mastery)}% mastered, ${s.ids.length} items. Start a drill.">
+        <span class="rock-cell"><span class="rock p${d} ${st.seen?"":"empty"}" style="--c:var(--d${d});width:${w}%"></span></span>
+        <span class="bed-label"><b>${esc(s.name)}</b>${h > 33 ? `<span>${pct(st.mastery)}% mastered, ${s.ids.length} items</span>` : ""}</span></button>`;
+    }
+  }
+  col += `<div class="strat-base"></div>`;
+
+  const focus = SUBJ.map(s => ({s, st: pr.per[s.name]})).sort((a,b) => (1-b.st.mastery)*Math.sqrt(b.s.ids.length)*(1.2-b.st.proj) - (1-a.st.mastery)*Math.sqrt(a.s.ids.length)*(1.2-a.st.proj)).slice(0,4);
+  const heat = heatmap();
+  const recent = P.sessions.slice(-5).reverse();
+  const calRow = k => { const [c,n] = cal.b[k]; return `<div class="row"><span>${CONF[k]}</span><div class="track"><div class="fill" style="width:${n?pct(c/n):0}%;background:var(--ink)"></div></div><span class="num">${n?pct(c/n)+"%":"–"}</span></div>`; };
+
+  app.innerHTML = topbar() + `<main class="wrap"><div class="dash">
+  <section class="panel dash-side" aria-labelledby="colh">
+    <div class="column-head"><h2 id="colh">Your stratigraphic column</h2><span class="muted num">${pr.seen} of ${Q.length} seen</span></div>
+    <div class="strat">${col}</div>
+    <p class="legend">Each bed is a subject, thickness is its share of the bank. Like a weathering profile, beds you've mastered stand out as resistant ledges; weak ones recede. Tap a bed to drill it.</p>
+  </section>
+
+  <section class="panel">
+    <div class="start">
+      <div><h2>${today >= goal ? "Goal met. Keep the rock rolling." : today ? "Pick up where you left off" : "Ready for today's review?"}</h2>
+        <p class="sub">${due} item${due===1?"":"s"} due for review${cal.blind ? `, ${cal.blind} blind spot${cal.blind===1?"":"s"} first` : ""}.</p></div>
+      <div class="goal"><div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="ring" style="--p:${Math.min(100, pct(today/goal))}" data-v="${today}" role="img" aria-label="${today} of ${goal} answers today"></div><span class="muted num" style="font-size:.78rem">goal ${goal}</span></div>
+        <button class="btn primary" data-act="smart">Start smart review</button></div>
+    </div>
+    <div class="modes">
+      <button class="mode" data-act="drillSetup"><b>Subject drill</b><span>Choose days, subjects, item source and exam year.</span></button>
+      <button class="mode" data-act="mockSetup"><b>Mock board exam</b><span>Timed, no feedback until the end, sampled like the real paper.</span></button>
+      <button class="mode" data-act="sprintSetup"><b>Seismic sprint</b><span>90 seconds. Wrong answers cost 5 seconds and shake the needle.</span><em>Best: ${P.sprintBest} correct</em></button>
+      <button class="mode" data-act="retryMissed" ${missed?"":"disabled"}><b>Fix mistakes</b><span>Everything you got wrong on your last try.</span><em>${missed} item${missed===1?"":"s"}</em></button>
+      <button class="mode" data-act="browse"><b>Browse the bank</b><span>Search all ${Q.length} items, read explanations, flag items.</span></button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="projh">
+    <h2 id="projh">Projected board rating</h2>
+    <p class="sub">What you'd likely score if the exam were today, based on what you've mastered, how long ago you reviewed it, and your accuracy on new items. Passing is a 70% average with no subject below 50% (RA 10166); the three days are weighted equally here.</p>
+    <div class="proj" style="margin-top:18px">
+      <div><div class="gwa num">${(pr.gwa*100).toFixed(1)}<small>%</small></div>${verdict}</div>
+      <div class="daybars">${[1,2,3].map(d => `<div class="daybar"><div class="row"><b>Day ${d}, ${DAYS[d]}</b><span class="num">${(pr.dr[d-1]*100).toFixed(1)}%</span></div>
+        <div class="track"><div class="fill" style="width:${pr.dr[d-1]*100}%;background:var(--d${d})"></div><div class="mark m50" style="left:50%" title="50% minimum"></div><div class="mark" style="left:70%" title="70% passing average"></div></div></div>`).join("")}</div>
+    </div>
+  </section>
+
+  <div class="insights">
+    <section class="panel"><h2>Focus next</h2><p class="sub">Weak, heavy subjects that would move your rating most.</p>
+      <ul class="focus-list">${focus.map(f => `<li><button data-act="drillSubject" data-s="${esc(f.s.name)}"><span style="display:flex;gap:8px;align-items:center;min-width:0"><span class="dot" style="background:var(--d${f.s.day})"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.s.name)}</span></span><span class="muted num">${pct(f.st.mastery)}%</span></button></li>`).join("")}</ul>
+    </section>
+    <section class="panel"><h2>Confidence check</h2><p class="sub">How often you're right at each confidence level. A gap between "Sure" and 100% means overconfidence.</p>
+      <div class="calib">${calRow(1)}${calRow(2)}${calRow(3)}</div>
+      <p class="empty-note">${cal.blind ? `<b>${cal.blind}</b> blind spot${cal.blind===1?"":"s"}: items you were sure of but missed. Smart review serves these first.` : "No blind spots yet."}</p>
+    </section>
+    <section class="panel"><h2>Hardness rank</h2><p class="sub">You climb the Mohs scale as items reach box 3 (answered right three reviews running).</p>
+      <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px"><span class="stat-big">${rk.name}</span><span class="muted">hardness ${rk.hardness}</span></div>
+      <div class="mohs" aria-hidden="true">${MOHS.map((m,i) => `<i class="${i<=rk.i?"on":""}" title="${m[0]}">${i+1}</i>`).join("")}</div>
+      <p class="empty-note num">${rk.mastered} mastered. ${rk.next ? `${rk.next[1]-rk.mastered} more to reach ${rk.next[0]}.` : "Top of the scale."}</p>
+    </section>
+    <section class="panel"><h2>Activity</h2><p class="sub num">${pc ? `Average ${pc.toFixed(0)} s per item. ` : ""}Last 18 weeks.</p>
+      <div class="heat" role="img" aria-label="Daily activity heatmap">${heat}</div>
+      ${recent.length ? `<ul class="sessions">${recent.map(s => `<li><span>${esc(s.title)}</span><span class="muted num">${s.c}/${s.n}, ${new Date(s.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span></li>`).join("")}</ul>` : `<p class="empty-note">Your sessions will show up here.</p>`}
+    </section>
+  </div>
+  </div></main>`;
+  window.scrollTo(0,0);
+}
+function heatmap(){
+  const weeks = 18, end = new Date(); end.setHours(0,0,0,0);
+  const startD = new Date(end); startD.setDate(end.getDate() - end.getDay() - (weeks-1)*7);
+  let h = "";
+  for(let i=0; i<weeks*7; i++){
+    const d = new Date(startD); d.setDate(startD.getDate() + i);
+    if(d > end){ h += `<i class="future"></i>`; continue; }
+    const n = P.days[dayKey(d.getTime())] || 0;
+    const l = n === 0 ? 0 : n < 10 ? 1 : n < 25 ? 2 : n < 50 ? 3 : 4;
+    h += `<i data-l="${l}" title="${dayKey(d.getTime())}: ${n} answers"></i>`;
+  }
+  return h;
+}
+
+/* ----- drill setup ----- */
+let D = null;
+function drillSetup(preSubject){
+  D = {days: preSubject ? [SUBJ.find(s => s.name === preSubject).day] : [1,2,3], subs: new Set(preSubject ? [preSubject] : SUBJ.map(s => s.name)), count: 20, pool: "all", src: "all", year: "any", noVerify: false};
+  renderDrill();
+}
+function drillIds(){
+  const t = now();
+  return Q.filter(q => D.days.includes(q.d) && D.subs.has(q.s)
+    && (D.src === "all" || q.b === D.src)
+    && (D.year === "any" || q.y.includes(D.year))
+    && (!D.noVerify || !/VERIFY/.test(q.n))
+    && (D.pool === "all" || (D.pool === "new" && !P.items[q.id]) || (D.pool === "missed" && P.items[q.id] && P.items[q.id].lr === 0)
+        || (D.pool === "due" && P.items[q.id] && P.items[q.id].due <= t) || (D.pool === "flag" && P.flags[q.id])
+        || (D.pool === "weak" && (!P.items[q.id] || P.items[q.id].box < 3)))).map(q => q.id);
+}
+function renderDrill(){
+  const seg = (name, opts, cur) => `<div class="seg" role="group">${opts.map(([v,l]) => `<button data-act="dset" data-k="${name}" data-v="${v}" aria-pressed="${String(cur) === String(v)}">${l}</button>`).join("")}</div>`;
+  const n = drillIds().length;
+  app.innerHTML = topbar() + `<main class="wrap page">
+    <h1>Subject drill</h1><p class="lead">Build a practice set. You'll see the answer and explanation after each item.</p>
+    <div class="field"><span class="lbl">Exam days</span><div class="seg">${[1,2,3].map(d => `<button data-act="dday" data-v="${d}" aria-pressed="${D.days.includes(d)}">Day ${d}, ${DAYS[d]}</button>`).join("")}</div></div>
+    <div class="field"><span class="lbl">Subjects</span>
+      <div class="seg"><button data-act="dsubAll" aria-pressed="false">Select all shown</button><button data-act="dsubNone" aria-pressed="false">Clear</button></div>
+      ${D.days.slice().sort().map(d => `<div class="subj-group"><h3><span class="dot" style="background:var(--d${d})"></span>Day ${d}</h3><div class="subj-grid">${SUBJ.filter(s => s.day === d).map(s => `<label><input type="checkbox" data-act="dsub" value="${esc(s.name)}" ${D.subs.has(s.name)?"checked":""}>${esc(s.name)}<span class="n">${s.ids.length}</span></label>`).join("")}</div></div>`).join("")}
+    </div>
+    <div class="field"><span class="lbl">Which items</span>${seg("pool", [["all","All"],["new","Not yet answered"],["weak","Not mastered"],["due","Due for review"],["missed","Missed last time"],["flag","Flagged"]], D.pool)}</div>
+    <div class="field"><span class="lbl">Item source</span>${seg("src", [["all","All sources"],["A","2019 board paper"],["R","Examinee recall"],["T","Trend topic"]], D.src)}</div>
+    <div class="field"><span class="lbl">Year seen on the exam</span>${seg("year", [["any","Any"],["2025","2025"],["2024","2024"],["2021","2021"],["2019","2019"],["2017","2017"],["2016","2016"],["2013","2013"],["2007","2007"],["2005","2005"]], D.year)}</div>
+    <div class="field"><label class="check" style="color:var(--ink)"><input type="checkbox" data-act="dverify" ${D.noVerify?"checked":""}> Skip items whose answer key is marked to verify</label></div>
+    <div class="field"><span class="lbl">Items per session</span>${seg("count", [[10,"10"],[20,"20"],[30,"30"],[50,"50"],[100,"100"],[0,"All matching"]], D.count)}</div>
+    <div class="match"><span class="num"><b>${n}</b> item${n===1?"":"s"} match</span><span style="display:flex;gap:8px"><button class="btn" data-act="home">Cancel</button><button class="btn primary" data-act="drillGo" ${n?"":"disabled"}>Start drill</button></span></div>
+  </main>`;
+}
+/* ----- mock setup ----- */
+let M = {day:1};
+function mockSetup(){
+  app.innerHTML = topbar() + `<main class="wrap page">
+    <h1>Mock board exam</h1><p class="lead">Items are sampled from each subject in proportion to the bank, so heavy subjects show up more, as on the board. You can move between items and change answers until you submit. Results and explanations come at the end.</p>
+    <div class="field"><span class="lbl">Paper</span><div class="seg">${[[1,"Day 1, "+DAYS[1]],[2,"Day 2, "+DAYS[2]],[3,"Day 3, "+DAYS[3]],[0,"Full exam, all three days"]].map(([v,l]) => `<button data-act="mday" data-v="${v}" aria-pressed="${M.day===v}">${l}</button>`).join("")}</div></div>
+    <div class="row-fields field">
+      <div><label for="mItems">Items per day</label><input id="mItems" type="number" min="10" max="300" step="10" value="${P.settings.mockItems}"></div>
+      <div><label for="mMin">Minutes per day</label><input id="mMin" type="number" min="5" max="480" step="5" value="${P.settings.mockMin}"></div>
+    </div>
+    <p class="muted" style="font-size:.9rem;max-width:60ch">Set these to match the item count and time limit in your PRC notice of admission. A full exam multiplies both by three.</p>
+    <div class="match"><span></span><span style="display:flex;gap:8px"><button class="btn" data-act="home">Cancel</button><button class="btn primary" data-act="mockGo">Start exam</button></span></div>
+  </main>`;
+}
+function sprintSetup(){
+  app.innerHTML = topbar() + `<main class="wrap page">
+    <h1>Seismic sprint</h1><p class="lead">Answer as many items as you can in 90 seconds. Every correct answer is a small tremor on the seismograph; every wrong one is a big jolt and costs you 5 seconds. Your result is reported as a magnitude.</p>
+    <div class="field"><span class="lbl">Draw items from</span><div class="seg">${[[0,"All days"],[1,"Day 1"],[2,"Day 2"],[3,"Day 3"],[9,"Items I've seen"]].map(([v,l]) => `<button data-act="sprintGo" data-v="${v}" aria-pressed="false">${l}</button>`).join("")}</div></div>
+    <p class="muted">Your best: <b class="num">${P.sprintBest}</b> correct${P.sprintBest ? ", magnitude " + magnitude(P.sprintBest) : ""}.</p>
+    <p><button class="btn" data-act="home">Back</button></p>
+  </main>`;
+}
+const magnitude = n => Math.min(9.9, 1 + Math.log2(1 + n) * 1.45).toFixed(1);
+
+/* ----- quiz ----- */
+function renderQuiz(){
+  const id = S.ids[S.i], q = QI[id], a = S.ans[S.i] || {}, mock = S.mode === "mock", sprint = S.mode === "sprint";
+  const revealed = !mock && !sprint && a.done;
+  const order = S.order[id];
+  const r = it(id);
+  const flagged = !!P.flags[id];
+  const choices = order.map((ci, k) => {
+    let cls = "choice";
+    if(revealed){ if(ci === q.a) cls += " right"; else if(ci === a.pick) cls += " wrong"; else cls += " dim"; }
+    else if(a.pick === ci) cls += " sel";
+    return `<li><button class="${cls}" data-act="pick" data-c="${ci}" ${revealed?"disabled":""}><kbd>${k+1}</kbd><span>${esc(q.c[ci])}</span></button></li>`;
+  }).join("");
+  const timer = S.limit ? `<span class="timer" id="timer">${fmtTime(remaining())}</span>` : "";
+  const progress = sprint ? `<div class="sprint-score"><span><b class="num">${S.score}</b> correct</span><span class="muted num">${S.wrong} wrong</span></div>` : `<span class="muted num">${S.i+1} of ${S.ids.length}</span>`;
+  const showConf = !mock && !sprint && P.settings.askConf && a.pick != null && !a.done;
+  let reveal = "";
+  if(revealed){
+    const ok = a.pick === q.a;
+    reveal = `<div class="verdict-line ${ok?"ok":"bad"}" role="status">${ok ? "Correct" : "Not quite. The answer is: " + esc(q.c[q.a])}${a.conf ? `<span class="muted" style="font-weight:500">(you said ${CONF[a.conf].toLowerCase()})</span>` : ""}</div>
+      <p class="explain">${esc(q.e)}</p>${q.n ? `<div class="note ${/VERIFY/.test(q.n)?"verify":""}"><b>${/VERIFY/.test(q.n)?"Verify":"Note"}:</b> ${esc(q.n.replace(/^VERIFY:\s*/,""))}</div>` : ""}`;
+  }
+  const last = S.i === S.ids.length - 1;
+  let foot = "";
+  if(mock){
+    foot = `<div class="qfoot"><button class="btn" data-act="mprev" ${S.i?"":"disabled"}>Previous</button>
+      <button class="btn flag" data-act="mflag" aria-pressed="${!!S.flags[S.i]}">Mark for review</button>
+      ${last ? `<button class="btn primary" data-act="msubmit">Submit exam</button>` : `<button class="btn primary" data-act="mnext">Next</button>`}</div>
+      <div class="palette" aria-label="Jump to item">${S.ids.map((_,k) => `<button data-act="mjump" data-v="${k}" class="${S.ans[k]?"done":""} ${k===S.i?"cur":""} ${S.flags[k]?"fl":""}" aria-label="Item ${k+1}${S.ans[k]?", answered":""}${S.flags[k]?", marked":""}">${k+1}</button>`).join("")}</div>
+      <p class="hint">Keys: 1 to 4 to answer, arrow keys to move, M to mark.</p>`;
+  }else if(!sprint){
+    foot = `<div class="qfoot"><button class="btn flag small" data-act="flag" aria-pressed="${!!flagged}">${flagged?"Flagged":"Flag item"}</button>
+      ${revealed ? `<button class="btn primary" data-act="next" id="nextBtn">${last ? "See results" : "Next item"}</button>` : `<button class="btn ghost small" data-act="skip">Skip</button>`}</div>
+      <p class="hint">Keys: 1 to 4 to answer${P.settings.askConf?", then S, U or G for confidence":""}, Enter for next, F to flag.</p>`;
+  }
+  app.innerHTML = `<div class="qwrap">
+    <div class="qbar"><button class="btn ghost small" data-act="${mock?"mquit":"quit"}">Exit</button><span class="title">${esc(S.title)}</span>${timer}</div>
+    ${sprint ? `<canvas class="seismo" id="seismo" aria-hidden="true"></canvas>` : `<div class="prog"><span style="width:${(Object.keys(S.ans).filter(k => mock ? S.ans[k] : S.ans[k].done).length)/S.ids.length*100}%"></span></div>`}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">${progress}</div>
+    <article class="qcard" id="qcard">
+      <div class="qmeta"><span class="tag" style="--c:var(--d${q.d})">Day ${q.d}</span><span>${esc(q.s)}</span><span class="basis ${q.b}">${BASIS[q.b]}</span>${q.y.length ? `<span>Seen ${q.y.join(", ")}</span>` : ""}${r && !mock && !sprint ? `<span>Box ${r.box} of 5</span>` : ""}</div>
+      <h2 class="qtext">${esc(q.q)}</h2>
+      <ol class="choices">${choices}</ol>
+      ${showConf ? `<div class="conf" role="group" aria-label="Confidence"><p>How sure are you?</p><div class="btns">${[1,2,3].map(k => `<button class="btn small" data-act="conf" data-v="${k}"><kbd>${CONF[k][0]}</kbd>${CONF[k]}</button>`).join("")}</div></div>` : ""}
+      ${reveal}
+      ${foot}
+    </article></div>`;
+  S.qt = S.qt || now();
+  if(sprint) drawSeismo();
+  const nb = $("#nextBtn"); if(nb) nb.focus({preventScroll:true});
+}
+function pick(ci){
+  const a = S.ans[S.i] = S.ans[S.i] || {};
+  if(a.done) return;
+  if(S.mode === "mock"){ a.pick = ci; a.ms = (a.ms||0) + (now() - S.qt); S.qt = now(); renderQuiz(); return; }
+  if(S.mode === "sprint"){ sprintAnswer(ci); return; }
+  a.pick = ci;
+  if(P.settings.askConf) renderQuiz(); else commit(0);
+}
+function commit(conf){
+  const a = S.ans[S.i]; if(!a || a.pick == null || a.done) return;
+  const id = S.ids[S.i], q = QI[id];
+  a.conf = conf; a.done = true; a.ms = now() - S.qt; a.ok = a.pick === q.a;
+  record(id, a.ok, conf, a.ms, S.mode); save();
+  renderQuiz();
+}
+function next(){
+  if(S.i >= S.ids.length - 1) return finishPractice();
+  S.i++; S.qt = now(); renderQuiz(); window.scrollTo(0,0);
+}
+function skip(){
+  // move the item to the end of the queue
+  const id = S.ids.splice(S.i, 1)[0]; S.ids.push(id); delete S.ans[S.i];
+  const rebuilt = {}; Object.keys(S.ans).forEach(k => { rebuilt[k] = S.ans[k]; }); S.ans = rebuilt;
+  S.qt = now(); renderQuiz();
+}
+function finishPractice(){
+  const done = Object.entries(S.ans).filter(([,a]) => a.done);
+  if(!done.length){ home(); return; }
+  const res = done.map(([k,a]) => ({id:S.ids[k], ok:a.ok, pick:a.pick, ms:a.ms, conf:a.conf}));
+  logSession(res); showResults(res);
+}
+function logSession(res){
+  P.sessions.push({t:now(), mode:S.mode, title:S.title, n:res.length, c:res.filter(r => r.ok).length});
+  save();
+}
+
+/* ----- mock flow ----- */
+function mockGo(){
+  const items = Math.max(10, Math.min(300, +$("#mItems").value || 100)), mins = Math.max(5, Math.min(480, +$("#mMin").value || 120));
+  P.settings.mockItems = items; P.settings.mockMin = mins; save();
+  const ids = mockQueue(M.day, items);
+  const days = M.day === 0 ? 3 : 1;
+  startSession("mock", ids, {limit: mins*60*days, title: M.day ? `Mock exam, Day ${M.day}` : "Mock exam, full", day:M.day});
+}
+function finishMock(timeUp){
+  clearInterval(window._tick);
+  S.elapsed = Math.min(now() - S.t0, S.limit*1000);
+  const res = S.ids.map((id,k) => { const a = S.ans[k]; const ok = !!a && a.pick === QI[id].a; return {id, ok, pick: a ? a.pick : null, ms: a ? a.ms : 0, conf:0}; });
+  res.forEach(r => { if(r.pick != null) record(r.id, r.ok, 0, r.ms, "mock"); });
+  logSession(res);
+  showResults(res, timeUp);
+}
+
+/* ----- sprint ----- */
+function sprintGo(v){
+  let pool = Q.filter(q => v === 0 || v === 9 || q.d === v).map(q => q.id);
+  if(v === 9) pool = pool.filter(id => P.items[id]);
+  if(v === 9 && pool.length < 20){ toast("Answer at least 20 items first, or pick another pool."); return; }
+  startSession("sprint", shuffle(pool), {limit: 90, title: "Seismic sprint"});
+}
+function sprintAnswer(ci){
+  const id = S.ids[S.i], q = QI[id], ok = ci === q.a;
+  S.ans[S.i] = {pick:ci, done:true, ok, ms: now() - S.qt};
+  record(id, ok, 0, now() - S.qt, "sprint");
+  if(ok) S.score++; else { S.wrong++; S.penalty += 5; }
+  S.trace.push(ok ? 1 : -1);
+  const btn = document.querySelector(`.choice[data-c="${ci}"]`);
+  document.querySelectorAll(".choice").forEach(b => b.disabled = true);
+  if(btn) btn.classList.add(ok ? "right" : "wrong");
+  if(!ok){ const right = document.querySelector(`.choice[data-c="${q.a}"]`); if(right) right.classList.add("right"); const c = $("#qcard"); c.classList.remove("quake"); void c.offsetWidth; c.classList.add("quake"); }
+  setTimeout(() => {
+    if(!S || S.mode !== "sprint") return;
+    if(remaining() <= 0) return finishSprint();
+    S.i++; if(S.i >= S.ids.length){ S.ids = S.ids.concat(shuffle(S.ids)); }
+    S.qt = now(); renderQuiz();
+  }, ok ? 320 : 900);
+}
+function drawSeismo(){
+  const c = $("#seismo"); if(!c) return;
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  c.width = w*dpr; c.height = h*dpr; const g = c.getContext("2d"); g.scale(dpr,dpr);
+  const cs = getComputedStyle(document.documentElement);
+  g.strokeStyle = cs.getPropertyValue("--line"); g.lineWidth = 1;
+  g.beginPath(); g.moveTo(0,h/2); g.lineTo(w,h/2); g.stroke();
+  const pts = 140, step = w / pts, ev = S.trace.slice(-12);
+  g.strokeStyle = cs.getPropertyValue("--ink"); g.lineWidth = 1.4; g.beginPath();
+  let seed = S.trace.length * 7 + 3; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for(let i=0;i<=pts;i++){
+    let y = (rnd()-.5) * 3;
+    ev.forEach((e,j) => { const center = pts - (ev.length - j) * (pts/13); const d = i - center; if(Math.abs(d) < 9){ const amp = e > 0 ? 9 : h*0.42; y += Math.sin(d*2.1) * amp * Math.exp(-Math.abs(d)/3); } });
+    const x = i*step; i ? g.lineTo(x, h/2 + y) : g.moveTo(x, h/2 + y);
+  }
+  g.stroke();
+}
+function finishSprint(){
+  clearInterval(window._tick);
+  const best = S.score > P.sprintBest; if(best) P.sprintBest = S.score;
+  const res = Object.entries(S.ans).map(([k,a]) => ({id:S.ids[k], ok:a.ok, pick:a.pick, ms:a.ms, conf:0}));
+  P.sessions.push({t:now(), mode:"sprint", title:"Seismic sprint", n:res.length, c:S.score}); save();
+  showResults(res, false, {sprint:true, best});
+}
+
+/* ----- results ----- */
+function showResults(res, timeUp, extra={}){
+  clearInterval(window._tick);
+  const mode = S.mode, title = S.title;
+  const n = res.length, c = res.filter(r => r.ok).length, ms = S.elapsed || res.reduce((a,r) => a + (r.ms||0), 0);
+  const bySub = {};
+  res.forEach(r => { const q = QI[r.id]; (bySub[q.s] = bySub[q.s] || {d:q.d, n:0, c:0}); bySub[q.s].n++; if(r.ok) bySub[q.s].c++; });
+  let board = "";
+  if(mode === "mock"){
+    const dayR = [1,2,3].map(d => { const xs = res.filter(r => QI[r.id].d === d); return xs.length ? xs.filter(r => r.ok).length / xs.length : null; });
+    const taken = dayR.filter(x => x != null);
+    const avg = taken.reduce((a,x) => a + x, 0) / taken.length;
+    const pass = avg >= .70 && taken.every(x => x >= .50);
+    board = `<div class="panel" style="margin-bottom:20px"><h2>${taken.length === 3 ? "Board-style rating" : "Day rating"}</h2>
+      <p class="sub">${taken.length === 3 ? "General average of the three days (equal weights). Passing: 70% average and no day below 50%." : "A single paper. On the board you need a 70% average across days and no subject below 50%."}</p>
+      <div class="daybars" style="margin-top:14px">${[1,2,3].filter(d => dayR[d-1] != null).map(d => `<div class="daybar"><div class="row"><b>Day ${d}, ${DAYS[d]}</b><span class="num">${(dayR[d-1]*100).toFixed(1)}%</span></div><div class="track"><div class="fill" style="width:${dayR[d-1]*100}%;background:var(--d${d})"></div><div class="mark m50" style="left:50%"></div><div class="mark" style="left:70%"></div></div></div>`).join("")}</div>
+      <p style="margin:14px 0 0"><span class="verdict ${pass?"pass":"fail"}">${pass ? "Passing score" : "Below passing"}</span>${timeUp ? ` <span class="muted">Time ran out; unanswered items count as wrong.</span>` : ""}</p></div>`;
+  }
+  const missed = res.filter(r => !r.ok);
+  const subRows = Object.entries(bySub).sort((a,b) => a[1].c/a[1].n - b[1].c/b[1].n).map(([s,v]) => `<tr><td><span style="display:inline-flex;gap:8px;align-items:center"><span class="dot" style="background:var(--d${v.d})"></span>${esc(s)}</span></td><td style="width:30%"><div class="minibar"><span style="width:${v.c/v.n*100}%;background:var(--d${v.d})"></span></div></td><td class="r">${v.c}/${v.n}</td><td class="r">${pct(v.c/v.n)}%</td></tr>`).join("");
+  const head = extra.sprint
+    ? `<div class="res-big num">M ${magnitude(S.score)}</div><div class="res-stats"><div><b class="num">${S.score}</b><span>correct</span></div><div><b class="num">${S.wrong}</b><span>wrong, cost ${S.wrong*5} s</span></div><div><b>${extra.best ? "New best" : P.sprintBest}</b><span>${extra.best ? "personal record" : "your best"}</span></div></div>`
+    : `<div class="res-big num">${n ? pct(c/n) : 0}<small>%</small></div><div class="res-stats"><div><b class="num">${c}/${n}</b><span>correct</span></div><div><b class="num">${fmtTime(ms/1000)}</b><span>${S.elapsed ? "total time" : "time on items"}</span></div><div><b class="num">${n ? (ms/n/1000).toFixed(0) : 0} s</b><span>per item</span></div></div>`;
+  app.innerHTML = topbar() + `<main class="wrap page" style="max-width:900px">
+    <p class="muted" style="margin:0">${esc(title)}</p>
+    <div class="res-head">${head}</div>
+    ${board}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      ${missed.length ? `<button class="btn primary" data-act="retryThese" data-ids="${missed.map(r => r.id).join(",")}">Review the ${missed.length} missed</button>` : ""}
+      <button class="btn ${missed.length ? "" : "primary"}" data-act="smart">Start smart review</button>
+      <button class="btn" data-act="home">Dashboard</button>
+    </div>
+    ${n ? `<h2 class="section-title">By subject</h2><table class="breakdown"><thead><tr><th>Subject</th><th>Score</th><th class="r">Items</th><th class="r">%</th></tr></thead><tbody>${subRows}</tbody></table>` : ""}
+    ${missed.length ? `<h2 class="section-title">Items you missed</h2>${missed.map(r => itemDetails(r.id, r.pick)).join("")}` : (n ? `<p class="empty-note" style="margin-top:24px">Clean sheet. Nothing to review from this session.</p>` : "")}
+  </main>`;
+  S = null; window.scrollTo(0,0);
+}
+function itemDetails(id, pick){
+  const q = QI[id], r = it(id);
+  const status = !r ? "var(--line)" : r.lr === 0 ? "var(--bad)" : r.box >= 3 ? "var(--ok)" : "var(--warn)";
+  return `<details class="item"><summary><span class="dot st" style="background:${status}"></span><span>${esc(q.q)}</span></summary><div class="body">
+    <div class="qmeta"><span class="tag" style="--c:var(--d${q.d})">Day ${q.d}</span><span>${esc(q.s)}</span><span class="basis ${q.b}">${BASIS[q.b]}</span>${q.y.length?`<span>Seen ${q.y.join(", ")}</span>`:""}</div>
+    <ul>${q.c.map((t,i) => `<li class="${i===q.a?"ans":i===pick?"pick":""}">${esc(t)}</li>`).join("")}</ul>
+    <p class="explain" style="margin:0">${esc(q.e)}</p>${q.n ? `<div class="note ${/VERIFY/.test(q.n)?"verify":""}">${esc(q.n)}</div>` : ""}
+    <p style="margin:12px 0 0"><button class="btn small flag" data-act="bflag" data-id="${id}" aria-pressed="${!!P.flags[id]}">${P.flags[id] ? "Flagged" : "Flag item"}</button></p>
+  </div></details>`;
+}
+
+/* ----- browse ----- */
+let B = {q:"", day:0, st:"all", shown:40};
+function browse(){
+  app.innerHTML = topbar() + `<main class="wrap page" style="max-width:900px">
+    <h1>Question bank</h1><p class="lead">All ${Q.length} items with answers and explanations. The dot shows your status: grey unseen, red missed last time, amber learning, green mastered.</p>
+    <div class="toolbar">
+      <input type="search" id="bq" placeholder="Search questions, choices or explanations" value="${esc(B.q)}" aria-label="Search">
+      <select id="bday" aria-label="Day"><option value="0">All days</option>${[1,2,3].map(d => `<option value="${d}" ${B.day==d?"selected":""}>Day ${d}</option>`).join("")}</select>
+      <select id="bst" aria-label="Status">${[["all","Any status"],["new","Unseen"],["missed","Missed last time"],["learning","Learning"],["mastered","Mastered"],["flag","Flagged"],["verify","Answer to verify"],["A","2019 board paper"]].map(([v,l]) => `<option value="${v}" ${B.st===v?"selected":""}>${l}</option>`).join("")}</select>
+    </div>
+    <div id="blist"></div></main>`;
+  const upd = () => { B.q = $("#bq").value; B.day = +$("#bday").value; B.st = $("#bst").value; B.shown = 40; renderBrowseList(); };
+  $("#bq").addEventListener("input", upd); $("#bday").addEventListener("change", upd); $("#bst").addEventListener("change", upd);
+  renderBrowseList();
+}
+function renderBrowseList(){
+  const terms = B.q.toLowerCase().split(/\s+/).filter(Boolean);
+  const xs = Q.filter(q => {
+    if(B.day && q.d !== B.day) return false;
+    const r = it(q.id);
+    switch(B.st){
+      case "new": if(r) return false; break;
+      case "missed": if(!r || r.lr !== 0) return false; break;
+      case "learning": if(!r || r.lr === 0 || r.box >= 3) return false; break;
+      case "mastered": if(!r || r.box < 3) return false; break;
+      case "flag": if(!P.flags[q.id]) return false; break;
+      case "verify": if(!/VERIFY/.test(q.n)) return false; break;
+      case "A": if(q.b !== "A") return false; break;
+    }
+    if(!terms.length) return true;
+    const hay = (q.q + " " + q.c.join(" ") + " " + q.e + " " + q.s).toLowerCase();
+    return terms.every(t => hay.includes(t));
+  });
+  $("#blist").innerHTML = `<p class="count num">${xs.length} item${xs.length===1?"":"s"}${xs.length ? `. <button class="btn small" data-act="quizThese" data-ids="${xs.slice(0,300).map(q => q.id).join(",")}">Quiz these${xs.length>300?" (first 300)":""}</button>` : ""}</p>`
+    + xs.slice(0, B.shown).map(q => itemDetails(q.id, null)).join("")
+    + (xs.length > B.shown ? `<p><button class="btn" data-act="more">Show more</button></p>` : "");
+}
+
+/* ----- settings ----- */
+function openSettings(){
+  const d = $("#settings"), s = P.settings;
+  d.innerHTML = `<h2>Settings</h2>
+    <div class="set-row"><div>Ask for confidence<span>After each answer, rate Sure, Unsure or Guess. Powers blind-spot tracking.</span></div><input type="checkbox" id="sConf" ${s.askConf?"checked":""} style="width:20px;height:20px;accent-color:var(--ink)"></div>
+    <div class="set-row"><div>Daily goal<span>Answers per day.</span></div><input type="number" id="sGoal" min="5" max="500" value="${s.goal}" style="width:90px"></div>
+    <div class="set-row"><div>Smart review length<span>Items per smart review session.</span></div><input type="number" id="sSize" min="5" max="100" value="${s.smartSize}" style="width:90px"></div>
+    <div class="set-row"><div>Exam date<span>Shows a countdown in the top bar.</span></div><input type="date" id="sDate" value="${s.examDate}"></div>
+    <div class="set-row"><div>Theme</div><select id="sTheme">${[["auto","Match device"],["light","Light"],["dark","Dark"]].map(([v,l]) => `<option value="${v}" ${s.theme===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div class="set-row"><div>Progress backup<span>Progress lives in this browser only. Export it to move to another device.</span></div><span style="display:flex;gap:6px"><button class="btn small" data-act="export">Export</button><button class="btn small" data-act="import">Import</button></span></div>
+    <div class="set-row"><div>Reset progress<span>Erases all answers, streaks and ranks on this device.</span></div><button class="btn small" data-act="reset" style="color:var(--bad)">Reset</button></div>
+    <div class="set-row"><div>Lock<span>Forget the PIN on this device and return to the lock screen.</span></div><button class="btn small" data-act="lock">Lock now</button></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="btn primary" data-act="closeSettings">Done</button></div>
+    <input type="file" id="importFile" accept="application/json" hidden>`;
+  d.showModal();
+  $("#importFile").addEventListener("change", importProgress);
+}
+function closeSettings(){
+  const s = P.settings;
+  s.askConf = $("#sConf").checked;
+  s.goal = Math.max(5, Math.min(500, +$("#sGoal").value || 30));
+  s.smartSize = Math.max(5, Math.min(100, +$("#sSize").value || 20));
+  s.examDate = $("#sDate").value; s.theme = $("#sTheme").value;
+  save(); applyTheme(); $("#settings").close();
+  if(!S) home();
+}
+function exportProgress(){
+  const blob = new Blob([JSON.stringify(P)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `strata-progress-${dayKey()}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function importProgress(e){
+  const f = e.target.files[0]; if(!f) return;
+  f.text().then(t => {
+    const x = JSON.parse(t);
+    if(!x || typeof x.items !== "object") throw new Error("bad");
+    if(!confirm("Replace the progress on this device with the imported file?")) return;
+    P = Object.assign(defaultProgress(), x); P.settings = Object.assign(defaultProgress().settings, x.settings || {});
+    save(); applyTheme(); $("#settings").close(); home(); toast("Progress imported.");
+  }).catch(() => toast("That file isn't a Strata progress export."));
+}
+let toastT;
+function toast(m){ let t = $(".toast"); if(!t){ t = document.createElement("div"); t.className = "toast"; t.setAttribute("role","status"); document.body.appendChild(t); } t.textContent = m; clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 3200); }
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]"); if(!el) return;
+  const act = el.dataset.act, v = el.dataset.v;
+  switch(act){
+    case "home": home(); break;
+    case "settings": openSettings(); break;
+    case "closeSettings": closeSettings(); break;
+    case "export": exportProgress(); break;
+    case "import": $("#importFile").click(); break;
+    case "reset": if(confirm("Erase all progress on this device? This can't be undone. Export first if you want a backup.")){ P = defaultProgress(); save(); $("#settings").close(); home(); toast("Progress reset."); } break;
+    case "lock": lockApp(); break;
+    case "smart": startSession("smart", smartQueue(P.settings.smartSize)); break;
+    case "drillSetup": drillSetup(); break;
+    case "drillSubject": drillSetup(el.dataset.s); break;
+    case "dday": { const d = +v; D.days = D.days.includes(d) ? D.days.filter(x => x !== d) : D.days.concat(d); if(!D.days.length) D.days = [d];
+      if(!D.days.includes(d)) SUBJ.filter(s => s.day === d).forEach(s => D.subs.delete(s.name)); else SUBJ.filter(s => s.day === d).forEach(s => D.subs.add(s.name)); renderDrill(); break; }
+    case "dsub": el.checked ? D.subs.add(el.value) : D.subs.delete(el.value); renderDrill(); break;
+    case "dsubAll": SUBJ.filter(s => D.days.includes(s.day)).forEach(s => D.subs.add(s.name)); renderDrill(); break;
+    case "dsubNone": D.subs.clear(); renderDrill(); break;
+    case "dset": D[el.dataset.k] = el.dataset.k === "count" ? +v : v; renderDrill(); break;
+    case "dverify": D.noVerify = el.checked; renderDrill(); break;
+    case "drillGo": { const ids = shuffle(drillIds()); startSession("drill", D.count ? ids.slice(0, D.count) : ids, {title: D.subs.size === 1 ? [...D.subs][0] : "Subject drill"}); break; }
+    case "mockSetup": mockSetup(); break;
+    case "mday": M.day = +v; document.querySelectorAll('[data-act="mday"]').forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.v === M.day))); break;
+    case "mockGo": mockGo(); break;
+    case "sprintSetup": sprintSetup(); break;
+    case "sprintGo": sprintGo(+v); break;
+    case "retryMissed": startSession("retry", shuffle(missedIds()).slice(0, 50), {title:"Fix mistakes"}); break;
+    case "retryThese": startSession("retry", shuffle(el.dataset.ids.split(",").map(Number)), {title:"Missed items"}); break;
+    case "quizThese": startSession("drill", shuffle(el.dataset.ids.split(",").map(Number)), {title:"Browse selection"}); break;
+    case "browse": browse(); break;
+    case "more": B.shown += 40; renderBrowseList(); break;
+    case "pick": pick(+el.dataset.c); break;
+    case "conf": commit(+v); break;
+    case "next": next(); break;
+    case "skip": skip(); break;
+    case "flag": toggleFlag(S.ids[S.i]); renderQuiz(); break;
+    case "bflag": { toggleFlag(+el.dataset.id); const f = P.flags[+el.dataset.id]; el.setAttribute("aria-pressed", String(!!f)); el.textContent = f ? "Flagged" : "Flag item"; break; }
+    case "quit": if(!Object.values(S.ans).some(a => a.done) || confirm("End this session? Answers so far are saved.")) finishPractice(); break;
+    case "mquit": if(confirm("Leave the mock exam? It won't be scored.")) home(); break;
+    case "mprev": S.i--; S.qt = now(); renderQuiz(); break;
+    case "mnext": S.i++; S.qt = now(); renderQuiz(); break;
+    case "mjump": S.i = +v; S.qt = now(); renderQuiz(); break;
+    case "mflag": S.flags[S.i] = !S.flags[S.i]; renderQuiz(); break;
+    case "msubmit": { const left = S.ids.length - Object.keys(S.ans).length; if(confirm(left ? `${left} item${left===1?" is":"s are"} unanswered. Submit anyway?` : "Submit the exam?")) finishMock(false); break; }
+  }
+});
+function toggleFlag(id){
+  if(P.flags[id]) delete P.flags[id]; else P.flags[id] = 1; save();
+}
+document.addEventListener("keydown", e => {
+  if(!S || e.target.matches("input,select,textarea") || e.metaKey || e.ctrlKey || e.altKey || $("#settings").open) return;
+  const a = S.ans[S.i] || {}, k = e.key.toLowerCase();
+  if(/^[1-4]$/.test(k)){
+    const order = S.order[S.ids[S.i]];
+    if(!a.done || S.mode === "mock"){ e.preventDefault(); pick(order[+k-1]); }
+    return;
+  }
+  if(S.mode === "mock"){
+    if(k === "arrowright" && S.i < S.ids.length-1){ S.i++; renderQuiz(); }
+    else if(k === "arrowleft" && S.i > 0){ S.i--; renderQuiz(); }
+    else if(k === "m"){ S.flags[S.i] = !S.flags[S.i]; renderQuiz(); }
+    return;
+  }
+  if(S.mode === "sprint") return;
+  if(a.pick != null && !a.done && ({s:1,u:2,g:3})[k]){ e.preventDefault(); commit(({s:1,u:2,g:3})[k]); return; }
+  if(k === "f"){ toggleFlag(S.ids[S.i]); renderQuiz(); return; }
+  if((k === "enter" || k === " ") && a.done){ e.preventDefault(); next(); }
+});
+window.addEventListener("resize", () => { if(S && S.mode === "sprint") drawSeismo(); });
+
+/* ---------- boot ---------- */
+(function boot(){
+  if(!VAULT){ $("#lockMsg").textContent = "No question bank was built into this page. Run build.py."; return; }
+  const saved = LS.get(KEY_PIN, null);
+  if(saved){ $("#remember").checked = true; tryUnlock(saved, true); }
+})();
+</script>
+</body>
+</html>
