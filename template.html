@@ -358,13 +358,12 @@ const DAYS = {1:"General Geology", 2:"Petrology & Mineralogy", 3:"Applied Geolog
 const BASIS = {A:"2019 board paper", R:"Examinee recall", T:"Trend topic"};
 const MOHS = [["Talc",0],["Gypsum",20],["Calcite",60],["Fluorite",120],["Apatite",200],["Orthoclase",320],["Quartz",460],["Topaz",620],["Corundum",820],["Diamond",1000]];
 const INTERVALS = [10*60e3, 1*DAY, 3*DAY, 7*DAY, 16*DAY, 35*DAY];   // Leitner box review gaps
-const STABILITY = [0.3, 2, 5, 12, 30, 70];                          // days, for the forgetting curve
 const CONF = {1:"Sure", 2:"Unsure", 3:"Guess"};
 const MODE_NAMES = {smart:"Smart review", drill:"Subject drill", mock:"Mock board exam", sprint:"Seismic sprint", retry:"Missed items"};
 let Q = [], QI = {}, SUBJ = [], P, S = null;
 
 function defaultProgress(){
-  return {v:1, items:{}, flags:{}, log:[], days:{}, sessions:[], sprintBest:0,
+  return {v:2, items:{}, flags:{}, log:[], days:{}, sessions:[], sprintBest:0,
     settings:{askConf:true, goal:30, examDate:"", theme:"auto", smartSize:20, mockItems:100, mockMin:120}};
 }
 function save(){
@@ -372,13 +371,35 @@ function save(){
   if(P.sessions.length > 200) P.sessions = P.sessions.slice(-200);
   if(!LS.set(KEY_P, P)) toast("Progress couldn't be saved in this browser. Export it from Settings to keep it.");
 }
+let MIG = {};
+/* Progress saved by the first release is keyed by spreadsheet row number.
+   Re-key it to the permanent question IDs, then drop anything for questions
+   that are no longer in the bank. */
+function migrateProgress(x){
+  if((x.v || 1) < 2){
+    const map = id => MIG[id];
+    const items = {}; for(const k in x.items || {}){ const n = map(k); if(n) items[n] = x.items[k]; }
+    const flags = {}; for(const k in x.flags || {}){ const n = map(k); if(n) flags[n] = x.flags[k]; }
+    x.items = items; x.flags = flags;
+    x.log = (x.log || []).map(e => { const n = map(e[1]); return n ? [e[0], n].concat(e.slice(2)) : null; }).filter(Boolean);
+    x.v = 2;
+  }
+  for(const k in x.items) if(!QI[k]) delete x.items[k];
+  for(const k in x.flags) if(!QI[k]) delete x.flags[k];
+  return x;
+}
+const explainHTML = t => esc(t).replace(/ (Step \d+:)/g, "<br>$1");
 function start(data){
-  Q = data.sort((a,b) => a.id - b.id);
+  if(Array.isArray(data)) data = {q: data, m: {}};
+  MIG = data.m || {};
+  Q = data.q.sort((a,b) => (a.no || 0) - (b.no || 0));
   Q.forEach(q => QI[q.id] = q);
   const seen = {};
   Q.forEach(q => { if(!seen[q.s]){ seen[q.s] = {name:q.s, day:q.d, ids:[]}; SUBJ.push(seen[q.s]); } seen[q.s].ids.push(q.id); });
-  P = Object.assign(defaultProgress(), LS.get(KEY_P, {}));
+  const stored = LS.get(KEY_P, null);
+  P = stored ? migrateProgress(Object.assign(defaultProgress(), stored, {v: stored.v || 1})) : defaultProgress();
   P.settings = Object.assign(defaultProgress().settings, P.settings || {});
+  if(stored) save();
   applyTheme();
   $("#lock").hidden = true; $("#app").hidden = false;
   home();
@@ -406,32 +427,53 @@ function record(id, ok, conf, ms, mode){
   const k = dayKey(t); P.days[k] = (P.days[k] || 0) + 1;
 }
 function itemMastery(id){ const r = it(id); return r ? r.box / 5 : 0; }
-function recallP(id, prior){
-  const r = it(id);
-  if(!r) return prior;
-  const dt = (now() - r.last) / DAY;
-  const ret = Math.exp(-dt / STABILITY[r.box]);
-  return r.box === 0 ? 0.25 + 0.75 * 0.3 * ret + 0.75*0.1 : 0.25 + 0.75 * ret;
+/* Your measured ability, all shrunk toward neutral values while data is thin:
+   A    first-try accuracy on any item (estimates every unanswered item)
+   hit  accuracy when re-asked an item you got right last time
+   miss accuracy when re-asked an item you got wrong last time          */
+function abilityModel(){
+  let fN = 0, fC = 0;
+  for(const k in P.items){ fN++; fC += P.items[k].first; }
+  const last = {}; let hN = 0, hC = 0, mN = 0, mC = 0;
+  for(const e of P.log){
+    const prev = last[e[1]];
+    if(prev === 1){ hN++; hC += e[2]; } else if(prev === 0){ mN++; mC += e[2]; }
+    last[e[1]] = e[2];
+  }
+  return {A: (fC + 5*0.5) / (fN + 5), hit: (hC + 10*0.9) / (hN + 10), miss: (mC + 10*0.55) / (mN + 10)};
 }
-function subjectStats(sub){
+const BOOST_DAYS = [3, 7, 14, 30, 60, 120];   // how long a review boost lasts, by box
+function recallP(id, base, M){
+  const r = it(id);
+  if(!r) return base;                                   // unanswered: your baseline for this subject
+  const ret = Math.exp(-(now() - r.last) / DAY / BOOST_DAYS[r.box]);
+  if(r.lr === 1){                                       // right last time: fades to halfway between baseline and re-test accuracy
+    const top = Math.max(M.hit, base), floor = base + 0.5 * (top - base);
+    return floor + (top - floor) * ret;
+  }
+  const floor = Math.min(base, 0.4);                    // wrong last time: fresh explanation helps, then fades
+  return floor + (Math.max(M.miss, floor) - floor) * ret;
+}
+function subjectStats(sub, M){
+  M = M || abilityModel();
   let m = 0, seen = 0, firstN = 0, firstOk = 0, mastered = 0, due = 0;
   const t = now();
   for(const id of sub.ids){
     const r = it(id);
     if(r){ seen++; m += r.box/5; firstN++; firstOk += r.first; if(r.box >= 3) mastered++; if(r.due <= t) due++; }
   }
-  const prior = (firstOk + 2*0.45) / (firstN + 2);
-  let p = 0; for(const id of sub.ids) p += recallP(id, prior);
-  return {mastery: m / sub.ids.length, coverage: seen / sub.ids.length, seen, mastered, due, proj: p / sub.ids.length, n: sub.ids.length};
+  const base = (firstOk + 8*M.A) / (firstN + 8);        // subject accuracy, borrowing from your overall accuracy
+  let p = 0; for(const id of sub.ids) p += recallP(id, base, M);
+  return {mastery: m / sub.ids.length, coverage: seen / sub.ids.length, seen, mastered, due, base, proj: p / sub.ids.length, n: sub.ids.length};
 }
 function projection(){
   const days = {1:{p:0,n:0},2:{p:0,n:0},3:{p:0,n:0}};
-  const per = {};
-  for(const s of SUBJ){ const st = subjectStats(s); per[s.name] = st; days[s.day].p += st.proj * st.n; days[s.day].n += st.n; }
+  const per = {}, M = abilityModel();
+  for(const s of SUBJ){ const st = subjectStats(s, M); per[s.name] = st; days[s.day].p += st.proj * st.n; days[s.day].n += st.n; }
   const dr = [1,2,3].map(d => days[d].p / days[d].n);
   const gwa = (dr[0] + dr[1] + dr[2]) / 3;
   const seen = Object.keys(P.items).length;
-  return {dr, gwa, per, coverage: seen / Q.length, seen};
+  return {dr, gwa, per, coverage: seen / Q.length, seen, M};
 }
 function rank(){
   let mastered = 0; for(const k in P.items) if(P.items[k].box >= 3) mastered++;
@@ -588,7 +630,8 @@ function home(){
 
   <section class="panel" aria-labelledby="projh">
     <h2 id="projh">Projected board rating</h2>
-    <p class="sub">What you'd likely score if the exam were today, based on what you've mastered, how long ago you reviewed it, and your accuracy on new items. Passing is a 70% average with no subject below 50% (RA 10166); the three days are weighted equally here.</p>
+    <p class="sub">Your likely score if the exam were today, across all ${Q.length} items. You don't need to answer them all: items you haven't answered are estimated from your first-try accuracy in that subject (or your overall accuracy, for subjects you haven't started). Items you have answered use your re-test accuracy, which fades toward that baseline the longer it's been since you reviewed them. Passing is a 70% average with no subject below 50% (RA 10166); the three days are weighted equally here.</p>
+    <p class="sub num" style="margin-top:6px">Based on ${pr.seen} answered item${pr.seen===1?"":"s"}. First-try accuracy so far: ${(pr.M.A*100).toFixed(0)}%.</p>
     <div class="proj" style="margin-top:18px">
       <div><div class="gwa num">${(pr.gwa*100).toFixed(1)}<small>%</small></div>${verdict}</div>
       <div class="daybars">${[1,2,3].map(d => `<div class="daybar"><div class="row"><b>Day ${d}, ${DAYS[d]}</b><span class="num">${(pr.dr[d-1]*100).toFixed(1)}%</span></div>
@@ -709,7 +752,7 @@ function renderQuiz(){
   if(revealed){
     const ok = a.pick === q.a;
     reveal = `<div class="verdict-line ${ok?"ok":"bad"}" role="status">${ok ? "Correct" : "Not quite. The answer is: " + esc(q.c[q.a])}${a.conf ? `<span class="muted" style="font-weight:500">(you said ${CONF[a.conf].toLowerCase()})</span>` : ""}</div>
-      <p class="explain">${esc(q.e)}</p>${q.n ? `<div class="note ${/VERIFY/.test(q.n)?"verify":""}"><b>${/VERIFY/.test(q.n)?"Verify":"Note"}:</b> ${esc(q.n.replace(/^VERIFY:\s*/,""))}</div>` : ""}`;
+      <p class="explain">${explainHTML(q.e)}</p>${q.n ? `<div class="note ${/VERIFY/.test(q.n)?"verify":""}"><b>${/VERIFY/.test(q.n)?"Verify":"Note"}:</b> ${esc(q.n.replace(/^VERIFY:\s*/,""))}</div>` : ""}`;
   }
   const last = S.i === S.ids.length - 1;
   let foot = "";
@@ -885,7 +928,7 @@ function itemDetails(id, pick){
   return `<details class="item"><summary><span class="dot st" style="background:${status}"></span><span>${esc(q.q)}</span></summary><div class="body">
     <div class="qmeta"><span class="tag" style="--c:var(--d${q.d})">Day ${q.d}</span><span>${esc(q.s)}</span><span class="basis ${q.b}">${BASIS[q.b]}</span>${q.y.length?`<span>Seen ${q.y.join(", ")}</span>`:""}</div>
     <ul>${q.c.map((t,i) => `<li class="${i===q.a?"ans":i===pick?"pick":""}">${esc(t)}</li>`).join("")}</ul>
-    <p class="explain" style="margin:0">${esc(q.e)}</p>${q.n ? `<div class="note ${/VERIFY/.test(q.n)?"verify":""}">${esc(q.n)}</div>` : ""}
+    <p class="explain" style="margin:0">${explainHTML(q.e)}</p>${q.n ? `<div class="note ${/VERIFY/.test(q.n)?"verify":""}">${esc(q.n)}</div>` : ""}
     <p style="margin:12px 0 0"><button class="btn small flag" data-act="bflag" data-id="${id}" aria-pressed="${!!P.flags[id]}">${P.flags[id] ? "Flagged" : "Flag item"}</button></p>
   </div></details>`;
 }
@@ -965,7 +1008,7 @@ function importProgress(e){
     const x = JSON.parse(t);
     if(!x || typeof x.items !== "object") throw new Error("bad");
     if(!confirm("Replace the progress on this device with the imported file?")) return;
-    P = Object.assign(defaultProgress(), x); P.settings = Object.assign(defaultProgress().settings, x.settings || {});
+    P = migrateProgress(Object.assign(defaultProgress(), x, {v: x.v || 1})); P.settings = Object.assign(defaultProgress().settings, x.settings || {});
     save(); applyTheme(); $("#settings").close(); home(); toast("Progress imported.");
   }).catch(() => toast("That file isn't a Strata progress export."));
 }

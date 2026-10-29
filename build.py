@@ -7,11 +7,18 @@ gzips and encrypts them with the access PIN (AES-256-GCM, key from
 PBKDF2-SHA256), and writes the result into template.html -> index.html.
 
 Usage:
-    python3 build.py "PRC_Geology_Board_Exam_Question_Bank_1.xlsx" [PIN]
+    python3 build.py "PRC_Geology_Board_Exam_Question_Bank_2.xlsx" [PIN]
+
+Each question's ID is a hash of its wording, so saved progress follows a
+question even if the sheet is re-sorted or renumbered. Rewording a question
+gives it a new ID (its progress starts fresh).
+
+migrate_v1.json (if present) maps the numbering used by the first release
+to these IDs, so browsers that saved progress under that release keep it.
 
 Needs:  pip install openpyxl cryptography
 """
-import base64, gzip, json, os, re, sys
+import base64, gzip, hashlib, json, os, re, sys
 
 import openpyxl
 from cryptography.hazmat.primitives import hashes
@@ -26,6 +33,11 @@ BASIS = {
     "Examinee recall – reconstructed": "R",
     "Trend topic – constructed item": "T",
 }
+
+
+def qid(text):
+    norm = re.sub(r"\s+", " ", text).strip().lower()
+    return int(hashlib.sha1(norm.encode()).hexdigest()[:10], 16) % 9_000_000_000_000 + 1_000_000
 
 
 def clean(v):
@@ -51,7 +63,8 @@ def load(path):
             letter = "ABCD"[choices.index(ans_text)]
         years = [y for y in YEARS if y in col and clean(r[col[y]])]
         out.append({
-            "id": int(r[col["No."]]),
+            "id": qid(clean(r[col["Question"]])),
+            "no": int(r[col["No."]]),
             "d": int(clean(r[col["Day"]]).split()[-1]),
             "s": clean(r[col["Subject"]]),
             "q": clean(r[col["Question"]]),
@@ -62,6 +75,9 @@ def load(path):
             "b": BASIS.get(clean(r[col["Item Basis"]]), "R"),
             "n": clean(r[col["Notes / To Verify"]]),
         })
+    ids = [q["id"] for q in out]
+    if len(set(ids)) != len(ids):
+        sys.exit("Two questions have identical wording; make them distinct and rebuild.")
     return out
 
 
@@ -79,7 +95,9 @@ def main():
         sys.exit(__doc__)
     pin = sys.argv[2] if len(sys.argv) > 2 else "1212"
     qs = load(sys.argv[1])
-    raw = json.dumps(qs, ensure_ascii=False, separators=(",", ":")).encode()
+    mig_path = os.path.join(HERE, "migrate_v1.json")
+    mig = json.load(open(mig_path)) if os.path.exists(mig_path) else {}
+    raw = json.dumps({"q": qs, "m": mig}, ensure_ascii=False, separators=(",", ":")).encode()
     blob = encrypt(gzip.compress(raw, 9), pin)
     tpl = open(os.path.join(HERE, "template.html"), encoding="utf-8").read()
     html = tpl.replace("/*__VAULT__*/null", json.dumps(blob))
